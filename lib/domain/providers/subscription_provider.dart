@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:perfect_app/utils/logger.dart';
 import '../../data/local/subscription_storage.dart';
 
 final subscriptionStatusProvider =
@@ -20,9 +21,9 @@ class SubscriptionNotifier extends StateNotifier<bool> {
   }
 
   Future<void> purchaseSubscription() async {
-    print('💳 Purchasing subscription...'); // Добавляем отладку
+    Logger.log('💳 Purchasing subscription...'); // Добавляем отладку
     await _storage.setSubscribed(true);
     state = true;
-    print('✅ Subscription purchased, state: $state'); // Добавляем отладку
+    Logger.success('✅ Subscription purchased, state: $state'); // Добавляем отладку
   }
 }

@@ -39,7 +39,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     if (_isProcessing) return;
     _isProcessing = true;
 
-    print('🔄 Starting purchase simulation...');
+    Logger.log('🔄 Starting purchase simulation...');
 
     // Шаг 1: Инициализация платежа
     PaymentOverlay.show(
@@ -89,18 +89,18 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     PaymentOverlay.hide();
 
     try {
-      print('💳 Calling purchaseSubscription...');
+      Logger.log('💳 Calling purchaseSubscription...');
       final subscriptionNotifier =
           ref.read(subscriptionStatusProvider.notifier);
       await subscriptionNotifier.purchaseSubscription();
-      print('✅ Purchase completed');
+      Logger.success('✅ Purchase completed');
 
       if (_screenContext.mounted) {
-        print('🚀 Navigating to home...');
+        Logger.log('🚀 Navigating to home...');
         _screenContext.go('/home');
       }
     } catch (e) {
-      print('❌ Error: $e');
+      Logger.('❌ Error: $e');
       if (_screenContext.mounted) {
         ScaffoldMessenger.of(_screenContext).showSnackBar(
           const SnackBar(
