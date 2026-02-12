@@ -100,7 +100,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
         _screenContext.go('/home');
       }
     } catch (e) {
-      Logger.('❌ Error: $e');
+      Logger.error('❌ Error: $e');
       if (_screenContext.mounted) {
         ScaffoldMessenger.of(_screenContext).showSnackBar(
           const SnackBar(

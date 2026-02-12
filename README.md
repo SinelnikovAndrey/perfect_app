@@ -1,16 +1,104 @@
 # perfect_app
 
-A new Flutter project.
+Приложение на Flutter с подпиской, онбордингом и платежной стенкой.
 
-## Getting Started
+## Обзор
 
-This project is a starting point for a Flutter application.
+Это приложение на Flutter, демонстрирующее типичный поток мобильного приложения с:
+- Экраном загрузки (splash)
+- Процессом онбординга
+- Платежной стенкой (paywall)
+- Главным экраном для подписчиков
 
-A few resources to get you started if this is your first Flutter project:
+Приложение использует Riverpod для управления состоянием и GoRouter для навигации.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Структура проекта
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```
+lib/
+├── main.dart
+├── app.dart
+├── config/
+│   └── router/
+│       └── app_router.dart
+├── core/
+│   ├── constants/
+│   │   └── app_constants.dart
+│   └── theme/
+│       └── app_theme.dart
+├── data/
+│   └── local/
+│       ├── shared_prefs.dart
+│       └── subscription_storage.dart
+├── domain/
+│   ├── models/
+│   │   └── subscription_plan.dart
+│   └── providers/
+│       └── subscription_provider.dart
+├── presentation/
+│   ├── splash/
+│   │   ├── splash_screen.dart
+│   │   └── splash_view_model.dart
+│   ├── onboarding/
+│   │   ├── onboarding_screen.dart
+│   │   └── onboarding_view_model.dart
+│   ├── paywall/
+│   │   ├── paywall_screen.dart
+│   │   └── widgets/
+│   │       ├── subscription_card.dart
+│   │       └── payment_bottom_sheet.dart
+│   └── home/
+│       ├── home_screen.dart
+│       └── home_view_model.dart
+└── utils/
+    └── logger.dart
+```
+
+## Особенности
+
+1. **Экран загрузки**: Начальный экран, проверяющий статус подписки
+2. **Онбординг**: Многостраничное введение в функции приложения
+3. **Платежная стенка**: Выбор подписки с различными планами (месячный/годовой)
+4. **Главный экран**: Основной контент для подписчиков
+5. **Управление состоянием**: Использование Riverpod для управления состоянием подписки
+6. **Навигация**: GoRouter для обработки маршрутов приложения
+7. **Локальное хранение**: SharedPreferences для хранения статуса подписки
+
+## Основные компоненты
+
+### Управление состоянием
+- `subscription_provider.dart`: Управление статусом подписки с использованием Riverpod StateNotifier
+- `subscription_storage.dart`: Обработка локального хранения данных о подписке
+
+### Компоненты интерфейса
+- **Экран загрузки**: Простой экран загрузки с логотипом Flutter
+- **Экран онбординга**: PageView с индикаторами и навигацией
+- **Экран платежной стенки**: Отображение планов подписки с карточками выбора
+- **Главный экран**: Основная область контента для подписчиков
+
+### Модели данных
+- `subscription_plan.dart`: Определяет структуру плана подписки с опциями месячной/годовой подписки
+
+### Утилиты
+- `logger.dart`: Простая утилита логирования для отладки
+
+## Начало работы
+
+1. Клонируйте репозиторий
+2. Выполните `flutter pub get` для установки зависимостей
+3. Выполните `flutter run` для запуска приложения
+
+## Зависимости
+
+- flutter_riverpod: Управление состоянием
+- go_router: Навигация
+- shared_preferences: Локальное хранение данных
+- google_fonts: Поддержка пользовательских шрифтов
+
+## Архитектура
+
+Приложение следует паттерну чистой архитектуры с разделением ответственности:
+- **Слой представления**: Компоненты пользовательского интерфейса и модели представления
+- **Доменный слой**: Бизнес-логика и модели данных
+- **Слой данных**: Источники данных и репозитории
+- **Ядерный слой**: Константы и конфигурация темы
