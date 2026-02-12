@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import '../../../domain/models/subscription_plan.dart';
 
 class PaymentBottomSheet extends StatelessWidget {
@@ -49,10 +48,7 @@ class PaymentBottomSheet extends StatelessWidget {
             icon: Icons.apple,
             title: 'Apple Pay',
             subtitle: 'Быстрая и безопасная оплата',
-            onTap: () {
-              context.pop();
-              onPaymentSuccess();
-            },
+            onTap: onPaymentSuccess,
           ),
           const SizedBox(height: 12),
           _buildPaymentOption(
@@ -60,9 +56,7 @@ class PaymentBottomSheet extends StatelessWidget {
             icon: Icons.credit_card,
             title: 'Банковская карта',
             subtitle: 'Visa, Mastercard, Мир',
-            onTap: () {
-              onPaymentSuccess();
-            },
+            onTap: onPaymentSuccess,
           ),
           const SizedBox(height: 24),
           Text(
@@ -87,6 +81,7 @@ class PaymentBottomSheet extends StatelessWidget {
   }) {
     return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -95,7 +90,7 @@ class PaymentBottomSheet extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(icon, size: 32),
+            Icon(icon, size: 32, color: Colors.blue.shade700),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -118,7 +113,7 @@ class PaymentBottomSheet extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right),
+            Icon(Icons.chevron_right, color: Colors.grey.shade400),
           ],
         ),
       ),

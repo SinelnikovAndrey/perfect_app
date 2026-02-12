@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:perfect_app/utils/logger.dart';
 import 'widgets/subscription_card.dart';
 import 'widgets/payment_bottom_sheet.dart';
+import 'widgets/payment_overlay.dart';
 import '../../domain/models/subscription_plan.dart';
 import '../../domain/providers/subscription_provider.dart';
 
@@ -16,34 +17,76 @@ class PaywallScreen extends ConsumerStatefulWidget {
 
 class _PaywallScreenState extends ConsumerState<PaywallScreen> {
   SubscriptionPlan? _selectedPlan;
-
-  // Сохраняем контекст экрана
-  late BuildContext _screenContext;
+  bool _isProcessing = false;
 
   @override
   void initState() {
     super.initState();
-    _screenContext = context;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _screenContext = context;
+    });
   }
 
+  @override
+  void dispose() {
+    PaymentOverlay.hide();
+    super.dispose();
+  }
+
+  late BuildContext _screenContext;
+
   Future<void> _simulatePurchase() async {
+    if (_isProcessing) return;
+    _isProcessing = true;
+
     print('🔄 Starting purchase simulation...');
 
-    // Используем сохраненный контекст экрана
-    ScaffoldMessenger.of(_screenContext).showSnackBar(
-      const SnackBar(
-        content: Text('Обработка платежа...'),
-        duration: Duration(seconds: 2),
-      ),
+    // Шаг 1: Инициализация платежа
+    PaymentOverlay.show(
+      context: _screenContext,
+      emoji: '💳',
+      message: 'Инициализация платежа...',
+    );
+
+    await Future.delayed(const Duration(seconds: 1));
+    if (!_screenContext.mounted) {
+      _isProcessing = false;
+      return;
+    }
+
+    // Шаг 2: Проверка карты
+    PaymentOverlay.update(
+      emoji: '🔒',
+      message: 'Проверка платежных данных...',
+    );
+
+    await Future.delayed(const Duration(seconds: 1));
+    if (!_screenContext.mounted) {
+      _isProcessing = false;
+      return;
+    }
+
+    // Шаг 3: Обработка платежа
+    PaymentOverlay.update(
+      emoji: '⚡',
+      message: 'Обработка платежа...',
     );
 
     await Future.delayed(const Duration(seconds: 2));
-    print('⏰ 2 seconds passed');
-
     if (!_screenContext.mounted) {
-      print('❌ Screen context not mounted');
+      _isProcessing = false;
       return;
     }
+
+    // Шаг 4: Успех!
+    PaymentOverlay.update(
+      emoji: '✅',
+      message: 'Платеж успешно обработан!',
+      backgroundColor: Colors.green,
+    );
+
+    await Future.delayed(const Duration(seconds: 1));
+    PaymentOverlay.hide();
 
     try {
       print('💳 Calling purchaseSubscription...');
@@ -66,6 +109,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
           ),
         );
       }
+    } finally {
+      _isProcessing = false;
     }
   }
 
@@ -77,8 +122,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
       builder: (context) => PaymentBottomSheet(
         plan: plan,
         onPaymentSuccess: () {
-          context.push('/home'); // Закрываем BottomSheet
-          _simulatePurchase(); // Вызываем без передачи контекста
+          Navigator.pop(context);
+          _simulatePurchase();
         },
       ),
     );
@@ -121,11 +166,14 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                     plan: plan,
                     isSelected: _selectedPlan?.id == plan.id,
                     onTap: () {
-                      Logger.log(
-                          'Tapped: ${plan.title}, isPopular: ${plan.isPopular}');
-                      setState(() {
-                        _selectedPlan = plan;
-                      });
+                      if (!_isProcessing) {
+                        // Проверка внутри
+                        Logger.log(
+                            'Tapped: ${plan.title}, isPopular: ${plan.isPopular}');
+                        setState(() {
+                          _selectedPlan = plan;
+                        });
+                      }
                     },
                   );
                 },
@@ -133,10 +181,10 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
             ),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: _selectedPlan != null
+              onPressed: (_selectedPlan != null && !_isProcessing)
                   ? () => _showPaymentSheet(_selectedPlan!)
-                  : null,
-              child: const Text('Продолжить'),
+                  : null, // Здесь null допустим для ElevatedButton
+              child: Text(_isProcessing ? 'Обработка...' : 'Продолжить'),
             ),
             const SizedBox(height: 16),
           ],
